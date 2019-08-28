@@ -52,39 +52,53 @@ const Users = require('../users/users-model.js');
 //
 module.exports = (req, res, next) => {
 
-  const tokenHeader = req.headers.authorization;
-  
+  const token = req.headers.authorization;
 
-  if (tokenHeader) {
-    const tokenStrings = tokenHeader.split(" ");
-    // at this point, tokenStrings[0] should be "bearer",
-    // and tokenStrings[1] should be our token.
-
-    // if our scheme is "bearer", and there is a token after it...
-    if (tokenStrings[0].toUpperCase() === 'BEARER' && tokenStrings[1]) {
-      jwt.verify(token, secrets.jwtSecret, (err, decodedToken) => {
-        if (err) {
-          // bad token!
-          res.status(401).json({message: 'error verifying token', error: err});
-        } else { 
-          // decodedToken! next()!
-          //
-          // we add decodedToken to the req object just so that 
-          // future middleware methods can have access to it...
-          // in our example here, no middleware methods are accessing
-          // it, but it makes sense to store it... our app may grow!
-          //
-          req.decodedJwt = decodedToken;
-          next();
-        }
-      });
-    // the scheme isn't "bearer", or there was no token after "bearer"
-    } else {
-      res.status(401).json({message:"invalid scheme, or no token after scheme name."})
-    }
-  // no authorization header was sent
+  if (token) {
+    jwt.verify(token, secrets.jwtSecret, (err, decodedToken) => {
+      if (err) {
+        // bad token
+        res.status(401).json({ message: 'wtf?', err });
+      } else {
+        // good token
+        req.decodedJwt = decodedToken;
+        next();
+      }
+    })
   } else {
-    res.status(401).json({message: 'missing Authorization header'});
+    res.status(401).json({ message: 'no token for you!!!' });
   }
+
+  // if (token) {
+  //   const tokenStrings = token.split(" ");
+  //   // at this point, tokenStrings[0] should be "bearer",
+  //   // and tokenStrings[1] should be our token.
+
+  //   // if our scheme is "bearer", and there is a token after it...
+  //   if (tokenStrings[0].toUpperCase() === 'BEARER' && tokenStrings[1]) {
+  //     jwt.verify(token, secrets.jwtSecret, (err, decodedToken) => {
+  //       if (err) {
+  //         // bad token!
+  //         res.status(401).json({ message: 'error verifying token', error: err });
+  //       } else {
+  //         // decodedToken! next()!
+  //         //
+  //         // we add decodedToken to the req object just so that 
+  //         // future middleware methods can have access to it...
+  //         // in our example here, no middleware methods are accessing
+  //         // it, but it makes sense to store it... our app may grow!
+  //         //
+  //         req.decodedJwt = decodedToken;
+  //         next();
+  //       }
+  //     });
+  //     // the scheme isn't "bearer", or there was no token after "bearer"
+  //   } else {
+  //     res.status(401).json({ message: "invalid scheme, or no token after scheme name." })
+  //   }
+  //   // no authorization header was sent
+  // } else {
+  //   res.status(401).json({ message: 'missing Authorization header' });
+  // }
 
 };

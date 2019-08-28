@@ -7,5 +7,5 @@
 // secret, but in a dev environment, it might make sense.
 //
 module.exports = {
-    jwtSecret: process.env.JWT_SECRET || 'wethotuwasatoad'
+    jwtSecret: process.env.JWT_SECRET || 'heywhowhatwherewhen'
 }
